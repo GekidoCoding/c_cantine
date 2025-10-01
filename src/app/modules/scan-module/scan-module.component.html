@@ -1,0 +1,21 @@
+  <app-header></app-header>
+  <ion-tabs>
+    <ion-fab vertical="bottom" horizontal="center">
+      <ion-fab-button>
+        <ion-icon name="restaurant-outline"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+  
+    <ion-tab-bar slot="bottom">
+      <ion-tab-button tab="generate" (click)="navigateToLeft()" [class.tab-selected]="activeTab === 'generate'">
+        <ion-icon name="qr-code-outline"></ion-icon>
+        <ion-label>QR Code</ion-label>
+      </ion-tab-button>
+      
+      <ion-tab-button tab="scanning" (click)="navigateToRight()" [class.tab-selected]="activeTab === 'scanning'">
+        <ion-icon name="scan-outline"></ion-icon>
+        <ion-label>Scanner </ion-label>
+      </ion-tab-button>
+    </ion-tab-bar>
+  </ion-tabs>
+  

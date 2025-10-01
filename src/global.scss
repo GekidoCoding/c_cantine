@@ -1,0 +1,156 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS/Sass files to be included in the
+ * output CSS.
+ * For more information on global stylesheets, visit the documentation:
+ * https://ionicframework.com/docs/layout/global-stylesheets
+ */
+
+/* Core CSS required for Ionic components to work properly */
+@import "~@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "~@ionic/angular/css/normalize.css";
+@import "~@ionic/angular/css/structure.css";
+@import "~@ionic/angular/css/typography.css";
+@import "~@ionic/angular/css/display.css";
+
+/* Optional CSS utils that can be commented out */
+@import "~@ionic/angular/css/padding.css";
+@import "~@ionic/angular/css/float-elements.css";
+@import "~@ionic/angular/css/text-alignment.css";
+@import "~@ionic/angular/css/text-transformation.css";
+@import "~@ionic/angular/css/flex-utils.css";
+
+body.scanner-active {
+  background: transparent !important;
+  --background:transparent;
+  --ion-background-color: transparent;  
+}
+
+/* Rendez transparents ion-app, ion-content et pages */
+body.scanner-active ion-app,
+body.scanner-active .app-root,
+body.scanner-active .ion-page,
+body.scanner-active ion-content {
+  --ion-background-color: transparent !important;
+  --background: transparent !important;
+  background: transparent !important;
+}
+
+/* For Ionic Shadow DOM backgrounds */
+body.scanner-active ion-content::part(background) {
+  background: transparent !important;
+}
+
+/* Permettre l'interaction avec les contrôles de scan */
+body.scanner-active .scan-controls,
+body.scanner-active .scan-result,
+body.scanner-active ion-button,
+body.scanner-active .scan-overlay {
+  background: rgba(0, 0, 0, 0.7) !important;
+  pointer-events: auto !important;
+  z-index: 9999 !important;
+}
+
+/* Boutons et contrôles visibles pendant le scan */
+body.scanner-active .scan-controls ion-button {
+  --background: rgba(220, 53, 69, 0.9) !important;
+  --color: white !important;
+  background: rgba(220, 53, 69, 0.9) !important;
+  color: white !important;
+  border-radius: 25px !important;
+  font-weight: bold !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Overlay pour les contrôles de scan */
+.scan-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 9998;
+}
+
+.scan-controls {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  pointer-events: auto;
+}
+
+/* As a last resort, strip backgrounds from all descendants during scan */
+body.scanner-active * {
+  background: transparent !important;
+}
+
+/* Exception pour les contrôles de scan */
+body.scanner-active .scan-controls *,
+body.scanner-active .scan-result *,
+body.scanner-active .scan-overlay * {
+  background: inherit !important;
+}
+
+/* Rendre le header transparent pendant le scan */
+body.scanner-active ion-toolbar,
+body.scanner-active .custom-header,
+body.scanner-active app-header,
+body.scanner-active ion-toolbar.custom-header {
+  --background: transparent !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Rendre les tabs transparents pendant le scan */
+body.scanner-active ion-tabs,
+body.scanner-active ion-tab-bar,
+body.scanner-active ion-tab-button {
+  --background: transparent !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Rendre le menu button transparent pendant le scan */
+body.scanner-active ion-menu-button,
+body.scanner-active .logout-button {
+  --background: transparent !important;
+  background: transparent !important;
+  color: transparent !important;
+  opacity: 0 !important;
+}
+
+/* Rendre le titre et tous les éléments du header transparents */
+body.scanner-active ion-title,
+body.scanner-active .user-name,
+body.scanner-active ion-buttons {
+  --background: transparent !important;
+  background: transparent !important;
+  color: transparent !important;
+  opacity: 0 !important;
+}
+
+/* S'assurer que tous les éléments du header sont transparents */
+body.scanner-active app-header * {
+  background: transparent !important;
+  color: transparent !important;
+  opacity: 0 !important;
+}
+
+/* Optionnel: supprimez les ombres/opacités qui peuvent masquer la caméra */
+body.scanner-active .modal-wrapper,
+body.scanner-active .content,
+body.scanner-active .toolbar,
+body.scanner-active .header,
+body.scanner-active .footer {
+  background: transparent !important;
+  box-shadow: none !important;
+}
