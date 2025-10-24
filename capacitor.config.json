@@ -1,6 +1,6 @@
 {
   "appId": "mg.cnaps.cantine",
-  "appName": "C-Cantine",
+  "appName": "E-Cantine",
   "webDir": "www",
   "bundledWebRuntime": false,
   "plugins": {

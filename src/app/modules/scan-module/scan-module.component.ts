@@ -1,11 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import {  AlertController, LoadingController } from '@ionic/angular';
+import { AlertController, LoadingController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Constant } from '../general/classes/constant';
 import { MenuItem } from '../general/classes/menu-item';
-import { AuthenticationService } from '../auth/services/authentication.service';
-import { User } from '../auth/classes/user';
 import { AccountService } from '../auth/services/account/account.service';
+import { User } from '../auth/classes/user';
+import { AuthenticationService } from '../auth/services/authentication.service';
 
 @Component({
   selector: 'app-scan',
@@ -13,32 +13,48 @@ import { AccountService } from '../auth/services/account/account.service';
   styleUrls: ['./scan-module.component.scss'],
 })
 export class ScanModuleComponent implements OnInit, OnDestroy {
- 
+  public matricule:string | null=null;
+  public agent:User = new User();
   public nom:any;
   version: string = '';
   public activeTab: string = 'generate';
   menu: MenuItem[] = [];
-  agent:User = new User();
+  role: string = sessionStorage.getItem('role') ?? 'B';
+  public displayName: string = '';
+
   constructor(
-       
+      private alertController: AlertController , 
       private loadingController: LoadingController,
-      private router: Router,
-      private authService:AuthenticationService,
       private accountService:AccountService,
-      private alertController:AlertController
+      private router: Router,
+      private authService:AuthenticationService
   ) {}
   ngOnInit(): void {
-    this.menu = Constant.menuPrincipal;
     this.loadAgent();
+    if(this.role === 'A'){
+      this.menu = Constant.menuPrincipalA;
+    }else{
+      this.menu = Constant.menuPrincipalB;
+    }
+    this.menu = Constant.menuPrincipalA;
+    this.matricule=this.accountService.getMatricule();
     this.setActiveTabFromRoute();
   }
-  loadAgent() {
+  loadAgent(){
     let userInput: User = {
       matricule: this.accountService.getMatricule(),
     };
     this.accountService.getAgentActif(userInput).subscribe((res: User[]) => {
-      this.agent = res[0];
+        this.agent=res[0];
+        this.displayName = this.truncateName(this.agent.nom + ' (' + this.agent.fonction + ')');
     });
+  }
+
+  truncateName(name: string, maxLength: number = 25): string {
+    if (name && name.length > maxLength) {
+      return name.substring(0, maxLength) + '...';
+    }
+    return name || '';
   }
   ngOnDestroy(): void {
     
@@ -63,14 +79,6 @@ export class ScanModuleComponent implements OnInit, OnDestroy {
     }
   }
 
- 
-  async presentLoading() {
-    const loading = await this.loadingController.create({
-      message: '...',
-    });
-    await loading.present();
-  }
-  
   async presentLogoutAlert() {
     const alert = await this.alertController.create({
       header: 'Confirmation',
@@ -83,23 +91,19 @@ export class ScanModuleComponent implements OnInit, OnDestroy {
         {
           text: 'Se déconnecter',
           role: 'confirm',
-          handler: async () => {
-            const loading = await this.loadingController.create({
-              message: 'Déconnexion en cours...',
-              spinner: 'crescent' 
-            });
-            await loading.present();
-
-            this.accountService.logout(() => {
-              loading.dismiss();
-            }, () => {
-              loading.dismiss(); 
-            });
+          handler: () => {
+            this.accountService.logout();
           }
         }
       ]
     });
 
     await alert.present();
+  }
+  async presentLoading() {
+    const loading = await this.loadingController.create({
+      message: '...',
+    });
+    await loading.present();
   }
 }

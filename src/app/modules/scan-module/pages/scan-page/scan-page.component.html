@@ -1,13 +1,13 @@
-<ion-content class="menu-content" [fullscreen]="true"  *ngIf="!scanning">
-  <div class="header-section" >
+<ion-content class="menu-content" [fullscreen]="true">
+  <div class="header-section" *ngIf="!scanning">
     <h1>Scanner et valider</h1>
     <p class="subtitle">Cliquez sur le bouton ci-dessous pour scanner le Code QR</p>
   </div>
   <div class="repas-container">
-    <ion-button class="round-button" (click)="startScan()" >
+    <ion-button class="round-button" (click)="startScan()" *ngIf="!scanning">
       <ion-icon name="scan-outline" class="scan-icon"></ion-icon>
     </ion-button>
-    <ng-container *ngIf="repas && (repas.lib_menu || repas.description) && !scanning else noRepas">
+    <ng-container *ngIf="repas && (repas.lib_menu || repas.description); else noRepas">
       <ion-card class="repas-card" style="max-width: 100%; width: 90%">
         <ion-card-header>
           <ion-card-title class="repas-title">
@@ -23,17 +23,11 @@
         </ion-card-header>
         <ion-card-content>
           <p class="repas-description"><strong style="color: #2c3e50;">Description : </strong> {{repas.description ?? 'N/A' }}</p>
-          <div class="scan-actions" *ngIf="repas.cantAgentWithLib.flag_recu != null">
-            <ion-button color="primary" (click)="startScan()" class="rescan-btn">
-              <ion-icon name="scan-outline"></ion-icon>
-              Scanner un autre code
-            </ion-button>
-          </div>
         </ion-card-content>
       </ion-card>
     </ng-container>
-    <ng-template #noRepas >
-      <div class="no-repas-message" >
+    <ng-template #noRepas>
+      <div class="no-repas-message">
         <ion-card class="empty-card">
           <ion-card-content>
             <div class="empty-content">
@@ -45,6 +39,8 @@
         </ion-card>
       </div>
     </ng-template>
-   
+    <div *ngIf="scanning" class="scan-result">
+      <ion-button color="danger" (click)="stopScan()">X Fermer</ion-button>
+    </div>
   </div>
-<ion-content>
+</ion-content>

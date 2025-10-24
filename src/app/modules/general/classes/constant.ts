@@ -5,7 +5,7 @@ export class Constant {
   static title = new Map([
     ['/travailleur/cit', 'CIT']
   ]);
-  static menuPrincipal: MenuItem[] = [
+  static menuPrincipalA: MenuItem[] = [
     {
       title: 'Check Repas ',
       url: '/cantine/today',
@@ -17,5 +17,11 @@ export class Constant {
       icon: 'qr-code-outline',
     },
   ];
-
+  static menuPrincipalB: MenuItem[] = [
+    {
+      title: 'Scanner Repas',
+      url: '/scan/generate',
+      icon: 'qr-code-outline',
+    },
+  ];
 }

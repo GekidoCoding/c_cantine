@@ -17,6 +17,7 @@ export class CantineComponent implements OnInit {
   version: string = '';
   public activeTab: string = 'today';
   menu: MenuItem[] = [];
+  public displayName: string = '';
 
   constructor(
       private alertController: AlertController , 
@@ -26,7 +27,7 @@ export class CantineComponent implements OnInit {
   ngOnInit(): void {
     this.loadAgent();
     this.matricule=this.accountService.getMatricule();
-    this.menu=Constant.menuPrincipal;
+    this.loadMenuBasedOnRole();
 
   }
   loadAgent(){
@@ -35,7 +36,28 @@ export class CantineComponent implements OnInit {
     };
     this.accountService.getAgentActif(userInput).subscribe((res: User[]) => {
         this.agent=res[0];
+        this.displayName = this.truncateName(this.agent.nom + ' (' + this.agent.fonction + ')');
     });
+  }
+
+  truncateName(name: string, maxLength: number = 25): string {
+    if (name && name.length > maxLength) {
+      return name.substring(0, maxLength) + '...';
+    }
+    return name || '';
+  }
+
+  loadMenuBasedOnRole() {
+    const role = sessionStorage.getItem('role');
+    console.log('Rôle actuel:', role);
+    
+    if (role === 'A') {
+      // Rôle A : accès complet (Check Repas + QR Repas)
+      this.menu = Constant.menuPrincipalA;
+    } else {
+      // Rôle B : accès limité (seulement Check Repas)
+      this.menu = Constant.menuPrincipalB;
+    }
   }
 
   async presentLogoutAlert() {

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">C-Cantine</string>
-    <string name="title_activity_main">C-Cantine</string>
+    <string name="app_name">E-Cantine</string>
+    <string name="title_activity_main">E-Cantine</string>
     <string name="package_name">mg.cnaps.cantine</string>
     <string name="custom_url_scheme">mg.cnaps.cantine</string>
 </resources>

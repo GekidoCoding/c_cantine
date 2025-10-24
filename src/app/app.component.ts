@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Constant } from './modules/general/classes/constant';
 import { MenuItem } from './modules/general/classes/menu-item';
-import { AlertController, LoadingController } from '@ionic/angular';
-import { AccountService } from './modules/auth/services/account/account.service';
+import { LoadingController } from '@ionic/angular';
 
 @Component({
   selector: 'app-root',
@@ -12,14 +11,18 @@ import { AccountService } from './modules/auth/services/account/account.service'
 export class AppComponent implements OnInit {
   menu: MenuItem[] = [];
   version: string = '';
+  role: string = sessionStorage.getItem('role') ?? 'B';
   constructor(
     private loadingController: LoadingController,
-    private alertController:AlertController,
-    private accountService:AccountService
   ) {
   }
   ngOnInit(): void {
-    this.menu = Constant.menuPrincipal;
+    if(this.role === 'A'){
+      this.menu = Constant.menuPrincipalA;
+    }else{
+      this.menu = Constant.menuPrincipalB;
+    }
+    
   }
   
 
@@ -28,36 +31,5 @@ export class AppComponent implements OnInit {
       message: '...',
     });
     await loading.present();
-  }
-  async presentLogoutAlert() {
-    const alert = await this.alertController.create({
-      header: 'Confirmation',
-      message: 'Voulez-vous vraiment vous déconnecter ?',
-      buttons: [
-        {
-          text: 'Annuler',
-          role: 'cancel'
-        },
-        {
-          text: 'Se déconnecter',
-          role: 'confirm',
-          handler: async () => {
-            const loading = await this.loadingController.create({
-              message: 'Déconnexion en cours...',
-              spinner: 'crescent' 
-            });
-            await loading.present();
-
-            this.accountService.logout(() => {
-              loading.dismiss();
-            }, () => {
-              loading.dismiss(); 
-            });
-          }
-        }
-      ]
-    });
-
-    await alert.present();
   }
 }
