@@ -5,7 +5,6 @@ import { IonicModule } from '@ionic/angular';
 import { CantineRoutingModule } from './cantine-routing-module';
 import { CantineComponent } from './cantine.component';
 import { TodayPageComponent } from './pages/today-page/today-page.component';
-import { GeneralModule } from '../general/general.module';
 
 @NgModule({
   declarations: [
@@ -16,7 +15,6 @@ import { GeneralModule } from '../general/general.module';
     CommonModule,
     IonicModule.forRoot(),
     CantineRoutingModule,
-    GeneralModule
   ]
 })
 export class CantineModule {}

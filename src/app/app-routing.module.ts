@@ -5,7 +5,7 @@ const routes: Routes = [
 
   {
     path: '',
-    redirectTo: 'cantine',
+    redirectTo: 'scan/generate',
     pathMatch: 'full',
   },
   {

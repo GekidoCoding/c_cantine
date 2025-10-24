@@ -81,20 +81,18 @@ export class AccountService {
     });
   }
 
-  logout(onSuccess?: () => void, onError?: () => void) {
-    const data = {
+  logout() {
+    var data = {
       matricule: this.getMatricule(),
     };
     sessionStorage.clear();
-    this.http.post(`${environment.PRINCIPAL}/api/auth/logout`, data).subscribe({
-      next: () => {
+    this.http.post(`${environment.PRINCIPAL}/api/auth/logout`, data).subscribe(
+      () => {
         this.authenticationService.navigateAfterLoginCantine('logout');
-        if (onSuccess) onSuccess(); // Appeler le callback de succès
       },
-      error: () => {
+      () => {
         this.authenticationService.navigateAfterLoginCantine('logout');
-        if (onError) onError(); // Appeler le callback d'erreur
       }
-    });
+    );
   }
 }

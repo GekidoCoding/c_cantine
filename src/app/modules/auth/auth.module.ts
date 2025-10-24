@@ -8,6 +8,7 @@ import { AuthPageRoutingModule } from './auth-routing.module';
 
 import { AuthPage } from './auth.page';
 import { LoginComponent } from './login/login.component';
+import { CantineService } from '../cantine/services/cantine/cantine.service';
 
 @NgModule({
   imports: [
@@ -18,5 +19,6 @@ import { LoginComponent } from './login/login.component';
     ReactiveFormsModule,
   ],
   declarations: [AuthPage, LoginComponent],
+  providers: [CantineService],
 })
 export class AuthPageModule {}

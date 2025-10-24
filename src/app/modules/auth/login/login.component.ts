@@ -15,6 +15,7 @@ import {
 import { AuthenticationService } from 'src/app/modules/auth/services/authentication.service';
 import { UserResponse } from '../classes/user.response';
 import { User } from '../classes/user';
+import { CantineService } from '../../cantine/services/cantine/cantine.service';
 
 @Component({
   selector: 'app-login',
@@ -36,10 +37,13 @@ export class LoginComponent implements OnInit {
     public alertController: AlertController,
     public toastController: ToastController, 
     private auth: AuthenticationService,
+    private cantineService: CantineService,
   ) {}
 
   ngOnInit(): void {
+    console.log(' LoginComponent initialized');
     this.loginForm.valueChanges.subscribe((res) => {
+      console.log(' Form value changed:', res);
       if (res.matricule != null && res.matricule.trim() != '') {
         this.rememberMeValue = res.matricule.trim();
       } else {
@@ -51,7 +55,9 @@ export class LoginComponent implements OnInit {
 
 
   login() {
+    console.log('🚀 Login attempt with values:', this.loginForm.value);
     if (this.loginForm.invalid) {
+      console.warn(' Form invalid');
       this.auth.presentToast(
         "Veuillez remplir l'identifiant et le mot de passe",
         'danger'
@@ -63,13 +69,36 @@ export class LoginComponent implements OnInit {
           .subscribe(
             (res: UserResponse) => {
               sessionStorage.setItem('user', res.token);
+              console.log(' Login success:', res);
               this.resetMdp();
-              this.loadingController.dismiss();
-              let user:User = new User();
-              user.matricule = res.matricule;
-              this.auth.navigateAfterLoginCantine('today');
+              
+              // Vérifier les privilèges pour déterminer le rôle
+              this.cantineService.getPrivilegeHas41or42(res.matricule).subscribe(
+                (hasPrivilege: boolean) => {
+                  const role = hasPrivilege ? 'A' : 'B';
+                  sessionStorage.setItem('role', role);
+                  console.log('Rôle déterminé:', role);
+                  
+                  this.loadingController.dismiss();
+                  let user:User = new User();
+                  user.matricule = res.matricule;
+                  console.log('Navigation après login');
+                  this.auth.navigateAfterLoginCantine('generate');
+                },
+                (error) => {
+                  console.error('Erreur lors de la vérification des privilèges:', error);
+                  // En cas d'erreur, attribuer le rôle B par défaut
+                  sessionStorage.setItem('role', 'B');
+                  this.loadingController.dismiss();
+                  let user:User = new User();
+                  user.matricule = res.matricule;
+                  console.log('Navigation après login');
+                  // this.auth.navigateAfterLoginCantine('generate');
+                }
+              );
             },
             (error: HttpErrorResponse) => {
+              console.error('❌ Login error:', error);
               this.resetMdp();
               this.rememberMe = false;
               this.loadingController.dismiss();
@@ -92,24 +121,30 @@ export class LoginComponent implements OnInit {
 
   toggleMdpType() {
     this.mdpType = this.mdpType == 'password' ? 'text' : 'password';
+    console.log(' Toggle mdpType:', this.mdpType);
   }
 
   resetMdp() {
     this.mdpType = 'password';
     this.mdp?.setValue('');
+    console.log('MDP reset done');
   }
 
   resetForm() {
     this.loginForm.reset();
+    console.log(' Form reset');
   }
 
   async presentLoading() {
     const loading = await this.loadingController.create({
+      message: 'En cours de connexion...',
     });
+    console.log(' Loading presented');
     await loading.present();
   }
 
   async presentAlertLoginFailed(header: string, message: string) {
+    console.warn(' Alert:', header, '-', message);
     const alert = await this.alertController.create({
       header: header,
       subHeader: message,

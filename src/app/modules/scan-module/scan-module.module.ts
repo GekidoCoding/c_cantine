@@ -6,7 +6,6 @@ import { ScanModuleComponent } from './scan-module.component';
 import { GenerateScanComponent } from './pages/generate-scan/generate-scan.component';
 import { ScanPageComponent } from './pages/scan-page/scan-page.component';
 import { IonicModule } from '@ionic/angular';
-import { GeneralModule } from '../general/general.module';
 
 
 @NgModule({
@@ -19,7 +18,7 @@ import { GeneralModule } from '../general/general.module';
     CommonModule,
     ScanModuleRoutingModule,
     IonicModule.forRoot(),
-    GeneralModule
+    
   ]
 })
 export class ScanModuleModule { }

@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { Platform, AlertController, LoadingController, ToastController } from '@ionic/angular';
+import { AuthenticationService } from 'src/app/modules/auth/services/authentication.service';
 import { CantAgent } from 'src/app/modules/cantine/models/cant-agent';
 import { CantRefMenuWithLib } from 'src/app/modules/cantine/models/cant-ref-menu-with-lib';
 import { CantineService } from 'src/app/modules/cantine/services/cantine/cantine.service';
@@ -19,6 +20,7 @@ export class ScanPageComponent implements OnInit, OnDestroy {
     private alertController: AlertController,
     private loadingController: LoadingController,
     private toastController: ToastController,
+    private authService: AuthenticationService,
     private cantineService: CantineService
   ) { }
 
@@ -85,59 +87,48 @@ export class ScanPageComponent implements OnInit, OnDestroy {
       await BarcodeScanner.hideBackground();
       document.querySelector('body')?.classList.add('scanner-active');
       this.scanning = true;
-      await loading.dismiss(); // Fermer le loading une fois le scan démarré
 
       const result = await BarcodeScanner.startScan();
 
       if (result.hasContent && result.content) {
-        await this.processScanResult(result.content);
+        const json = JSON.parse(result.content);
+        const cantAgent: CantAgent = Object.assign(new CantAgent(), json);
+        console.log("cant agent scanning: " + JSON.stringify(cantAgent));
+        if (cantAgent.agent_matricule) {
+          this.cantineService.getCantineNow(cantAgent.agent_matricule).subscribe({
+            next: async (data) => {
+              const repas: CantRefMenuWithLib = data.listCantRefMenuWithLib[0];
+              console.log("Son repas est: " + JSON.stringify(repas));
+              this.repas = repas;
+              this.cantineService.setFlagRecuCantAgent(cantAgent).subscribe({
+                next: async () => {
+                  repas.cantAgentWithLib.flag_recu="O";
+                  localStorage.setItem("repasAgent", JSON.stringify(repas));
+                  await this.presentSuccessToast('Scan effectué avec succès !');
+                  console.log("Scan successfully");
+                },
+                error: async (err) => {
+                  await this.presentErrorToast('Erreur lors de la mise à jour du statut.');
+                  console.error('Erreur lors de la mise à jour:', err);
+                }
+              });
+            },
+            error: async (err) => {
+              await this.presentErrorToast('Erreur lors de la récupération du repas.');
+              console.error('Erreur lors de la récupération:', err);
+            }
+          });
+        } else {
+          await this.presentErrorToast('QR code invalide.');
+        }
       } else {
         await this.presentErrorToast('Aucun contenu scanné.');
       }
     } catch (err) {
-      console.error('Erreur lors du scan:', err);
       await this.presentErrorToast('Erreur lors du scan.');
+      console.error('Erreur lors du scan:', err);
     } finally {
       await this.stopScan();
-    }
-  }
-
-  private async processScanResult(content: string) {
-    try {
-      const json = JSON.parse(content);
-      const cantAgent: CantAgent = Object.assign(new CantAgent(), json);
-      
-      if (cantAgent.agent_matricule) {
-        const loading = await this.presentLoading();
-        
-        this.cantineService.getCantineNow(cantAgent.agent_matricule).subscribe({
-          next: async (data) => {
-            await loading.dismiss();
-            const repas: CantRefMenuWithLib = data.listCantRefMenuWithLib[0];
-            this.repas = repas;
-            
-            this.cantineService.setFlagRecuCantAgent(cantAgent).subscribe({
-              next: async () => {
-                repas.cantAgentWithLib.flag_recu = "O";
-                localStorage.setItem("repasAgent", JSON.stringify(repas));
-                await this.presentSuccessToast('Scan effectué avec succès !');
-              },
-              error: async () => {
-                await this.presentErrorToast('Erreur lors de la mise à jour du statut.');
-              }
-            });
-          },
-          error: async () => {
-            await loading.dismiss();
-            await this.presentErrorToast('Erreur lors de la récupération du repas.');
-          }
-        });
-      } else {
-        await this.presentErrorToast('QR code invalide.');
-      }
-    } catch (parseError) {
-      console.error('Erreur de parsing du QR code:', parseError);
-      await this.presentErrorToast('Format de QR code invalide.');
     }
   }
 
@@ -150,25 +141,11 @@ export class ScanPageComponent implements OnInit, OnDestroy {
   }
 
   async stopScan() {
-    try {
-      this.scanning = false;
-      await BarcodeScanner.showBackground();
-      await BarcodeScanner.stopScan();
-      document.querySelector('body')?.classList.remove('scanner-active');
-      
-      // Dismiss any active loading
-      const loading = await this.loadingController.getTop();
-      if (loading) {
-        await loading.dismiss();
-      }
-      
-      // Ne pas naviguer automatiquement, laisser l'utilisateur sur la page
-      // this.authService.navigateAfterLoginCantine('scanning');
-    } catch (error) {
-      console.error('Erreur lors de l\'arrêt du scan:', error);
-      // Forcer le nettoyage même en cas d'erreur
-      this.scanning = false;
-      document.querySelector('body')?.classList.remove('scanner-active');
-    }
+    this.scanning = false;
+    await BarcodeScanner.showBackground();
+    await BarcodeScanner.stopScan();
+    document.querySelector('body')?.classList.remove('scanner-active');
+    await this.loadingController.dismiss();
+    this.authService.navigateAfterLoginCantine('scanning');
   }
 }

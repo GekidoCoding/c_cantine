@@ -64,11 +64,13 @@ export class TodayPageComponent implements OnInit {
       const matricule = this.accounService.getMatricule();
       this.cantineService.getCantineNow(matricule).subscribe({
         next: async (data) => {
+          console.log("repas now: " + JSON.stringify(data));
           this.repas = data.listCantRefMenuWithLib[0];
           this.cantAgent.id_cant_agent = data.listCantRefMenuWithLib[0]?.cantAgentWithLib?.id_cant_agent;
           this.cantAgent.agent_matricule = this.accounService.getMatricule();
         },
-        error: async () => {
+        error: async (err) => {
+          console.error('initRepas: Erreur lors de la requête: ', err);
           await this.presentErrorToast('Erreur lors du chargement du repas.');
         },
         complete: async () => {
@@ -78,6 +80,7 @@ export class TodayPageComponent implements OnInit {
     } catch (err) {
       await loading.dismiss();
       await this.presentErrorToast('Erreur inattendue lors du chargement.');
+      console.error('initRepas: Erreur: ', err);
     }
   }
 
@@ -85,12 +88,16 @@ export class TodayPageComponent implements OnInit {
     if (this.cantAgent.id_cant_agent) {
       const loading = await this.presentLoading('Mise à jour du repas...');
       try {
+        console.log("recevoirRepas: this.cantAgent.id_cant_agent: " + JSON.stringify(this.cantAgent));
         this.cantineService.setFlagRecuCantAgent(this.cantAgent).subscribe({
-          next: async () => {
+          next: async (data) => {
+            console.log('recevoirRepas: Réponse reçue: ' + JSON.stringify(data));
             await this.initRepas();
+            console.log("nouveau repas: " + JSON.stringify(this.repas));
             await this.presentSuccessToast('Repas marqué comme reçu !');
           },
-          error: async () => {
+          error: async (err) => {
+            console.error('recevoirRepas: Erreur lors de la requête: ', err);
             await this.presentErrorToast('Erreur lors de la mise à jour du repas.');
           },
           complete: async () => {
@@ -100,9 +107,11 @@ export class TodayPageComponent implements OnInit {
       } catch (err) {
         await loading.dismiss();
         await this.presentErrorToast('Erreur inattendue lors de la mise à jour.');
+        console.error('recevoirRepas: Erreur: ', err);
       }
     } else {
       await this.presentErrorToast('Aucun repas valide à marquer comme reçu.');
+      console.log("oooh no! this.cantAgent.id_cant_agent is none in cantAgent to RequestBody");
     }
   }
 

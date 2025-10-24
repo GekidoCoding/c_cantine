@@ -15,7 +15,6 @@ export class GenerateScanComponent implements OnInit {
   repas: CantRefMenuWithLib = new CantRefMenuWithLib();
   cantAgent: CantAgent = new CantAgent();
   qrData: string | null = null;
-
   constructor(
     private cantineService: CantineService,
     private accounService: AccountService,
@@ -53,12 +52,14 @@ export class GenerateScanComponent implements OnInit {
       const matricule = this.accounService.getMatricule();
       this.cantineService.getCantineNow(matricule).subscribe({
         next: async (data) => {
+          console.log("repas now: " + JSON.stringify(data));
           this.repas = data.listCantRefMenuWithLib[0];
           this.cantAgent.id_cant_agent = data.listCantRefMenuWithLib[0]?.cantAgentWithLib?.id_cant_agent;
           this.cantAgent.agent_matricule = this.accounService.getMatricule();
           await this.showQRrepas();
         },
-        error: async () => {
+        error: async (err) => {
+          console.error('initRepas: Erreur lors de la requête: ', err);
           await this.presentErrorToast('Erreur lors du chargement du repas.');
         },
         complete: async () => {
@@ -68,6 +69,7 @@ export class GenerateScanComponent implements OnInit {
     } catch (err) {
       await loading.dismiss();
       await this.presentErrorToast('Erreur inattendue lors du chargement.');
+      console.error('initRepas: Erreur: ', err);
     }
   }
 
@@ -78,13 +80,15 @@ export class GenerateScanComponent implements OnInit {
         const payload = JSON.stringify(this.cantAgent);
         this.qrData = await QRCode.toDataURL(payload, { width: 300 });
       } catch (err) {
+        console.error('showQRrepas: QR generation failed', err);
         this.qrData = null;
         await this.presentErrorToast('Erreur lors de la génération du QR code.');
       } finally {
         await loading.dismiss();
       }
-    } else {
-      await this.presentErrorToast('Aucun repas valide pour générer un QR code.');
-    }
+    } 
+    // else {
+    //   await this.presentErrorToast('Aucun repas valide pour générer un QR code.');
+    // }
   }
 }

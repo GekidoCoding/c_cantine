@@ -21,6 +21,7 @@ export class AuthenticationService {
       matricule: matricule,
       password: mdp
     };
+    console.log("data login:"+JSON.stringify(data))
     return this.http.post<UserResponse>(
       `${environment.PRINCIPAL}/api/auth/signin`,
       data
