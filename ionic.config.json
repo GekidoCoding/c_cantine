@@ -1,7 +1,0 @@
-{
-  "name": "cantine",
-  "integrations": {
-    "capacitor": {}
-  },
-  "type": "angular"
-}
