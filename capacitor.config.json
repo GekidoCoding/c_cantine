@@ -1,0 +1,11 @@
+{
+  "appId": "mg.cnaps.cantine",
+  "appName": "C-Cantine",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": true
+    }
+  }
+}

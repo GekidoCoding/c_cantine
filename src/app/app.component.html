@@ -1,0 +1,28 @@
+<ion-app>
+  <ion-menu side="start" menuId="first" contentId="main" class="my-custom-menu">
+    <div class="menu-header">
+      <ion-grid>
+        <ion-row>
+          <ion-col>
+            <div>
+              <ion-img src="assets/logo_cnaps.png" style="width: 100%; height: 70px"></ion-img>
+            </div>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </div>
+    <ion-content>
+      <ion-list id="inbox-list">
+        <ion-menu-toggle auto-hide="false" *ngFor="let p of menu; let i = index">
+          <ion-item routerDirection="root" [routerLink]="p.url" lines="none" detail="false"
+            [routerLinkActiveOptions]="{ exact: true }" routerLinkActive="selected">
+            <ion-icon slot="start" [name]="p.icon"></ion-icon>
+            <ion-label style="font-size: 1rem;">{{ p.title }}</ion-label></ion-item>
+        </ion-menu-toggle>
+      </ion-list>
+    
+      <ion-label ><a>© CNaPS Madagascar</a></ion-label>
+    </ion-content>
+  </ion-menu>
+  <ion-router-outlet id="main"></ion-router-outlet>
+</ion-app>
